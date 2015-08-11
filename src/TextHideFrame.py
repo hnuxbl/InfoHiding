@@ -9,7 +9,6 @@ from SecretKey import extractKey
 from Crypto.Cipher import AES
 
 class TextHideFrame:
-
     def __init__(self, master):
         self.frame = Frame(master)
         self.frame.grid(row = 0, column = 0)
