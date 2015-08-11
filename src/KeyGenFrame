@@ -1,0 +1,75 @@
+from Tkinter import *
+import tkFileDialog, tkMessageBox
+
+from PIL import Image, ImageTk
+
+from SecretKey import generateKey
+
+class KeyGenerateFrame:
+
+    def __init__(self, master):
+        self.frame = Frame(master)
+        self.frame.grid(row = 0, column = 0)
+
+        self.canvasWidth = 400
+        self.canvasHeight = 300
+        self.image = None
+        self.photo = None
+        self.done = False
+        self.suffix = ''
+        self.chooseBtn = Button(self.frame, text = 'Choose one image...', command = self.chooseImage)
+        self.chooseBtn.grid(row = 0, column = 0, padx = 10, pady = 10)
+        self.genBtn = Button(self.frame, text = 'Generate AES KEY', command = self.generateKey)
+        self.genBtn.grid(row = 0, column = 1, padx = 10, pady = 10)
+        self.saveBtn = Button(self.frame, text = 'SAVE KEY', command = self.saveKeyImg)
+        self.saveBtn.grid(row = 0, column = 2, padx = 10, pady = 10)
+
+        self.canvas = Canvas(self.frame, width = self.canvasWidth, height = self.canvasHeight, bg = 'white')
+        self.canvas.grid(row = 1, column = 0, columnspan = 3, sticky = SE, padx = 10, pady = 10)
+
+    def chooseImage(self):
+        imgPath = tkFileDialog.askopenfilename(parent = self.frame, initialdir = '/home/st/Pictures', title = 'Choose One Color Image', filetypes = [('BMP', '.bmp'), ('PNG', '.png')])
+        if imgPath != "":
+            self.image = Image.open(imgPath)
+            imgMode = self.image.mode
+            (w, h) = self.image.size
+            if len(imgMode) != 3:
+                tkMessageBox.showwarning('Warnings', 'Please choose one 3 channel color image\nYour choise mode is ' + str(imgMode))
+                self.image = None
+            elif w * h < 102:
+                tkMessageBox.showwarning('Warnings', "The image's size w * h must > 102")
+                self.image = None
+            else:
+                self.suffix = imgPath[imgPath.index('.') : ]
+                thumbImg = self.image.copy()
+                thumbImg.thumbnail((self.canvasWidth, self.canvasHeight))
+                self.photo = ImageTk.PhotoImage(thumbImg)
+                self.canvas.create_image(self.canvasWidth / 2, self.canvasHeight / 2, image = self.photo)
+
+    def generateKey(self):
+        if self.image is not None:
+            generateKey(self.image)
+            self.done = True
+            tkMessageBox.showinfo('Infos', 'AES KEY Generate success!')
+        else:
+            tkMessageBox.showwarning('Warnings', 'Please choose one 3 channel color image firstly!')
+
+    def saveKeyImg(self):
+        if self.image is None:
+            tkMessageBox.showwarning('Warnings', 'Please choose one 3 channel color image firstly!')
+        elif not self.done:
+            tkMessageBox.showwarning('Warnings', 'Please generate AES Key before save!')
+        else:
+            imgName = 'AES_KEY%s' % self.suffix
+            savePath = tkFileDialog.asksaveasfilename(parent = self.frame, initialdir = '/home/st/Pictures', title = 'Choose One Color Image', initialfile = imgName, filetypes = [('BMP', '.bmp'), ('PNG', '.png')])
+            if savePath != "":
+                self.image.save(savePath)
+                tkMessageBox.showinfo('Infos', 'AES KEY save success!\npath: %s' % savePath)
+
+
+if __name__ == "__main__":
+    root = Tk()
+    root.title('AES Key Generating')
+    keyFrame = KeyGenerateFrame(root)
+
+    root.mainloop()
