@@ -7,10 +7,10 @@ This is information hiding tool base on the `LSB`([least significant bit] (https
 Requirements
 ------------
 ```
-sudo apt-get install python<br>
-sudo apt-get install python-tk<br>
-sudo apt-get install python-pil<br>
-sudo apt-get install python-imaging-tk<br>
+sudo apt-get install python
+sudo apt-get install python-tk
+sudo apt-get install python-pil
+sudo apt-get install python-imaging-tk
 ```
 Usage
 -----
